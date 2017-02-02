@@ -56,7 +56,7 @@ class BitbucketClient
     options = {
       body: {
         content: body,
-        line_from: position,
+        line_to: position,
         filename: path
       }
     }
