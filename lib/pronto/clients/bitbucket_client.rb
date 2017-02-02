@@ -4,6 +4,7 @@ class BitbucketClient
 
   def initialize(username, password)
     credentials = { username: username, password: password }
+    validate! credentials
     @headers = { basic_auth: credentials }
   end
 
@@ -51,5 +52,12 @@ class BitbucketClient
 
   def openstruct(response)
     response.map { |r| OpenStruct.new(r) }
+  end
+
+  private
+  def validate! credentials
+    username = credentials[:username]
+    password = credentials[:password]
+    raise ArgumentError if [username, password].any?{|c| c.nil? || c.empty? }
   end
 end
