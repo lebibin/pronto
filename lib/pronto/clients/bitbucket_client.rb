@@ -1,5 +1,12 @@
 class BitbucketClient
   include HTTParty
+
+  class << self
+    def base_uri_v1
+      'https://api.bitbucket.org/1.0'
+    end
+  end
+
   base_uri 'https://api.bitbucket.org/2.0'
 
   def initialize(username, password)
@@ -9,7 +16,9 @@ class BitbucketClient
   end
 
   def commit_comments(slug, sha)
-    response = self.class.get("/#{slug}/changesets/#{sha}/comments", @headers)
+    endpoint = "/changesets/#{sha}/comments"
+    url = "#{self.class.base_uri_v1}/repositories/#{slug}#{endpoint}"
+    response = self.class.get(url, @headers)
     openstruct(response.parsed_response)
   end
 
@@ -22,32 +31,39 @@ class BitbucketClient
       }
     }
     options.merge!(@headers)
-    self.class.post("/#{slug}/changesets/#{sha}/comments", options)
+    endpoint = "/changesets/#{sha}/comments"
+    url = "#{self.class.base_uri_v1}/repositories/#{slug}#{endpoint}"
+    self.class.post(url, options)
   end
 
   def pull_comments(slug, pr_id)
-    url = "/#{slug}/pullrequests/#{pr_id}/comments"
+    endpoint = "/pullrequests/#{pr_id}/comments"
+    url = "#{self.class.base_uri}/repositories/#{slug}#{endpoint}"
     response = self.class.get(url, @headers)
-    openstruct(response.parsed_response)
+    values = parse(response)
+    openstruct(values)
   end
 
   def pull_requests(slug)
-    base = 'https://api.bitbucket.org/2.0/repositories'
-    url = "#{base}/#{slug}/pullrequests?state=OPEN"
+    endpoint = '/pullrequests?state=OPEN'
+    url = "#{self.class.base_uri}/repositories/#{slug}#{endpoint}"
     response = self.class.get(url, @headers)
-    openstruct(response.parsed_response['values'])
+    values = parse(response)
+    openstruct(values)
   end
 
   def create_pull_comment(slug, pull_id, body, path, position)
     options = {
       body: {
         content: body,
-        line_to: position,
+        line_from: position,
         filename: path
       }
     }
     options.merge!(@headers)
-    self.class.post("/#{slug}/pullrequests/#{pull_id}/comments", options)
+    endpoint = "/pullrequests/#{pull_id}/comments"
+    url = "#{self.class.base_uri_v1}/repositories/#{slug}#{endpoint}"
+    self.class.post(url, options)
   end
 
   def openstruct(response)
@@ -55,9 +71,17 @@ class BitbucketClient
   end
 
   private
-  def validate! credentials
+  def validate!(credentials)
     username = credentials[:username]
     password = credentials[:password]
     raise ArgumentError if [username, password].any?{|c| c.nil? || c.empty? }
+  end
+
+  def parse(response)
+    if response.code == 200
+      response.parsed_response['values']
+    else
+      raise Exception.new(response.response)
+    end
   end
 end

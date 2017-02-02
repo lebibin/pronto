@@ -4,7 +4,6 @@ require 'gitlab'
 require 'forwardable'
 require 'httparty'
 require 'rainbow'
-require 'dotenv'
 
 require 'pronto/gem_names'
 
@@ -44,8 +43,6 @@ require 'pronto/formatter/bitbucket_pull_request_formatter'
 require 'pronto/formatter/checkstyle_formatter'
 require 'pronto/formatter/null_formatter'
 require 'pronto/formatter/formatter'
-
-Dotenv.load
 
 module Pronto
   def self.run(commit = 'master', repo_path = '.',

@@ -25,22 +25,21 @@ Gem::Specification.new do |s|
 
   s.files = `git ls-files`.split($RS).reject do |file|
     file =~ %r{^(?:
-    spec/.*
-    |Gemfile
-    |Rakefile
-    |pronto.gif
-    |\.rspec
-    |\.gitignore
-    |\.rubocop.yml
-    |\.travis.yml
-    )$}x
+                 spec/.*
+                 |Gemfile
+                 |Rakefile
+                 |pronto.gif
+                 |\.rspec
+                 |\.gitignore
+                 |\.rubocop.yml
+                 |\.travis.yml
+                )$}x
   end
   s.test_files = []
   s.extra_rdoc_files = ['LICENSE', 'README.md']
   s.require_paths = ['lib']
   s.executables = s.files.grep(%r{^bin/}) { |f| File.basename(f) }
 
-  s.add_dependency('dotenv')
   s.add_runtime_dependency('rugged', '~> 0.24', '>= 0.23.0')
   s.add_runtime_dependency('thor', '~> 0.19.0')
   s.add_runtime_dependency('octokit', '~> 4.3', '>= 4.1.0')
