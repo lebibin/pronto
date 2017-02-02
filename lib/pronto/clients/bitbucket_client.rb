@@ -1,6 +1,6 @@
 class BitbucketClient
   include HTTParty
-  base_uri 'https://api.bitbucket.org/1.0/repositories'
+  base_uri 'https://api.bitbucket.org/2.0'
 
   def initialize(username, password)
     credentials = { username: username, password: password }
